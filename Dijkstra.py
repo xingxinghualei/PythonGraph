@@ -23,9 +23,11 @@ def dijkstra(graph, size_n, size_e, s):
         weight[cnt_adj] = x[2]
         next[cnt_adj] = head[x[0]]
         head[x[0]] = cnt_adj
-    vis = [False] * (n + 1)
-    dis = [2147483647] * (n + 1)
+    vis = [False] * (n + 2)
+    dis = [2147483647] * (n + 2)
+    ret = [0] * (n + 2)
     dis[s] = 0
+    ret[s] = s
     H = Fib(0, 0)
     H.Insert(0, s)
     while H.min != 0:
@@ -40,6 +42,7 @@ def dijkstra(graph, size_n, size_e, s):
             w = weight[i]
             if dis[v] > dis[u] + w:
                 dis[v] = dis[u] + w
+                ret[v] = ret[u]
                 H.Insert(dis[v], v)
             i = next[i]
     return dis
