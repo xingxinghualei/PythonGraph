@@ -42,10 +42,10 @@ def dijkstra(graph, size_n, size_e, s):
             w = weight[i]
             if dis[v] > dis[u] + w:
                 dis[v] = dis[u] + w
-                ret[v] = ret[u]
+                ret[v] = u
                 H.Insert(dis[v], v)
             i = next[i]
-    return dis
+    return dis, ret
 
 
 """
@@ -53,6 +53,20 @@ n = 4
 m = 6
 src = 1
 graph = [[1, 2, 2], [2, 3, 2], [2, 4, 1], [1, 3, 5], [3, 4, 3], [1, 4, 4]]
+dis = dijkstra(graph, n, m, src)
+for x in range(1, n + 1):
+    print(dis[x])
+"""
+"""
+path = "io\\temp.txt"
+fo = open(path, "r")
+n, m = [int(x) for x in fo.readline().split()]
+graph = []
+for i in range(m):
+    temp = [int(x) for x in fo.readline().split()]
+    graph.append(temp)
+fo.close()
+src = 1
 dis = dijkstra(graph, n, m, src)
 for x in range(1, n + 1):
     print(dis[x])

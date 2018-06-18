@@ -4,6 +4,8 @@
 import re
 from tkinter import *
 
+from Dijkstra import dijkstra
+
 
 class Label_1:
     def __init__(self, top):
@@ -65,12 +67,14 @@ class Button_1:
 top_op = Tk()
 top_io = Tk()
 top_mdzz = Tk()
-top_mdzz.withdraw()
+top_query = Tk()
 top_io.withdraw()
+top_mdzz.withdraw()
+top_query.withdraw()
 op_io = 3
 
 
-def show_op(top_op, top_io, top_mdzz):
+def show_op(top_op, top_io, top_mdzz, top_query):
     top_op.update()
     top_op.deiconify()
     lx_op = Label_1(top_op)
@@ -89,12 +93,12 @@ def show_op(top_op, top_io, top_mdzz):
         if cmd == 1:
             op_io = 1
             hide(top_op)
-            show_mdzz(top_op, top_io, top_mdzz)
+            show_mdzz(top_op, top_io, top_mdzz, top_query)
             return op_io
         elif cmd == 2:
             op_io = 2
             hide(top_op)
-            show_io(top_op, top_io, top_mdzz)
+            show_io(top_op, top_io, top_mdzz, top_query)
             return op_io
         elif cmd == 0:
             exit(0)
@@ -108,7 +112,7 @@ def show_op(top_op, top_io, top_mdzz):
     top_op.mainloop()
 
 
-def show_io(top_op, top_io, top_mdzz):
+def show_io(top_op, top_io, top_mdzz, top_query):
     top_io.update()
     top_io.deiconify()
     lx_io = Label_1(top_io)
@@ -134,10 +138,11 @@ def show_io(top_op, top_io, top_mdzz):
             print("请输入txt文档")
             exit(1)
         hide(top_io)
+        show_query(top_op, top_io, top_mdzz, top_query, path)
 
     def back_1():
         hide(top_io)
-        show_op(top_op, top_io, top_mdzz)
+        show_op(top_op, top_io, top_mdzz, top_query)
     bx_1 = Button_1(top_io)
     bx_1.generate("确认", sure_1, 4, 1)
     bx_2 = Button_1(top_io)
@@ -145,7 +150,7 @@ def show_io(top_op, top_io, top_mdzz):
     top_io.mainloop()
 
 
-def show_mdzz(top_op, top_io, top_mdzz):
+def show_mdzz(top_op, top_io, top_mdzz, top_query):
     top_mdzz.update()
     top_mdzz.deiconify()
     lx_v = Label_1(top_mdzz)
@@ -204,10 +209,13 @@ def show_mdzz(top_op, top_io, top_mdzz):
                     fo.write(y + " ")
                 fo.write("\n")
             fo.close()
+            path = "io\\temp.txt"
+            hide(top_mdzz)
+            show_query(top_op, top_io, top_mdzz, top_query, path)
 
     def back_1():
         hide(top_mdzz)
-        show_op(top_op, top_io, top_mdzz)
+        show_op(top_op, top_io, top_mdzz, top_query)
     bx_1 = Button_1(top_mdzz)
     bx_1.generate("确认", sure_1, 7, 1)
     bx_2 = Button_1(top_mdzz)
@@ -215,11 +223,74 @@ def show_mdzz(top_op, top_io, top_mdzz):
     top_mdzz.mainloop()
 
 
+def show_query(top_op, top_io, top_mdzz, top_query, path):
+    top_query.update()
+    top_query.deiconify()
+    varS = StringVar()
+    varT = StringVar()
+    lx_1 = Label_1(top_query)
+    lx_1.generate("起点", 0, 1)
+    lx_2 = Label_1(top_query)
+    lx_2.generate("终点", 1, 1)
+    ex_1 = Entry_1(top_query)
+    ex_1.generate(varS, 0, 2)
+    ex_2 = Entry_1(top_query)
+    ex_2.generate(varT, 1, 2)
+
+    lx_3 = Label_1(top_query)
+    lx_3.generate("最短路权值:", 2, 1)
+    lx_4 = Label_1(top_query)
+    lx_4.generate("", 2, 2)
+    lx_5 = Label_1(top_query)
+    lx_5.generate("路径:", 3, 1)
+    lx_6 = Label_1(top_query)
+    lx_6.generate("", 3, 2)
+
+    # 生成Dijkstra的params
+    fo = open(path, "r")
+    try:
+        n, m = [int(x) for x in fo.readline().split()]
+        graph = []
+        for i in range(m):
+            temp = [int(x) for x in fo.readline().split()]
+            graph.append(temp)
+    except:
+        print("数据不符合要求")
+        exit(1)
+    fo.close()
+
+    def sure_1():
+        src = int(ex_1.entry.get())
+        ter = int(ex_2.entry.get())
+        dis, ret = dijkstra(graph, n, m, src)
+        lx_4.lab["text"] = str(dis[ter])
+        ss = "%d" % ter
+
+        def rout(x, trip):
+            if x == ret[x]:
+                trip = ("%d" % x) + "->" + trip
+                return trip
+            else:
+                trip = ("%d" % x) + "->" + trip
+                return rout(ret[x], trip)
+        ss = rout(ret[ter], ss)
+        lx_6.lab["text"] = ss
+
+    def back_1():
+        hide(top_query)
+        show_op(top_op, top_io, top_mdzz, top_query)
+
+    bx_1 = Button_1(top_query)
+    bx_1.generate("确认", sure_1, 4, 1)
+    bx_2 = Button_1(top_query)
+    bx_2.generate("返回", back_1, 4, 3)
+
+
 def hide(top):
     top.withdraw()
 
 
-show_op(top_op, top_io, top_mdzz)
+show_op(top_op, top_io, top_mdzz, top_query)
 
 """
 lx_io = Label_1(top)
