@@ -55,3 +55,14 @@ Test = Graph(10)
 x = Test.generate(20, [1, 20], directed=False)
 print(x)
 """
+n = 100
+m = 400
+Test = Graph(m)
+edges = Test.generate(n, [1, 20])
+fo = open("io\\rg.txt", "w")
+fo.write(str(n) + " " + str(m) + "\n")
+for x in edges:
+    for y in x:
+        fo.write(str(y) + " ")
+    fo.write("\n")
+fo.close()

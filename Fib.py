@@ -16,20 +16,6 @@ class FibNode:
         self.r = 0
         self.marked = False
 
-    # x.AddChild(y): y becomes x's child
-    def AddChild(self, y):
-        y.p = self
-        self.deg = self.deg + 1
-        if self.c == 0:
-            self.child = y
-            y.le = y
-            y.r = y
-        else:
-            temp = self.c
-            y.r = temp
-            y.le = temp.le
-            y.le.r = temp
-
 
 class Fib:
     def __init__(self, n, minn):
@@ -37,6 +23,11 @@ class Fib:
         self.min = minn
 
     def PrintRoot(self):
+        """
+        print all node in Fibonacci
+        use bracket to divide the depth
+        and display the node depth
+        """
         z = self.min
         zle = self.min.le
         while True:
@@ -62,16 +53,17 @@ class Fib:
                 z = z.r
 
     def Insert(self, key, sta):
+        """
+            Create a node with key and satellite data
+            Insert the node into root list
+        """
         x = FibNode(key, sta)
         if self.min == 0:
             self.min = x
             x.le = x
             x.r = x
         else:
-            x.r = self.min
-            x.le = self.min.le
-            x.le.r = x
-            self.min.le = x
+            self.AddNode(x, self.min)
             if x.key < self.min.key:
                 self.min = x
         self.n = self.n + 1
@@ -79,20 +71,19 @@ class Fib:
     def ExtractMin(self):
         z = self.min
         if z != 0:
-            if z.c != 0:
-                y = z.c
-                while y.p != 0:
-                    x = y.le
-                    y.p = 0
-                    y.le = 0
-                    y.r = 0
-                    y.r = self.min
-                    y.le = self.min.le
-                    y.le.r = y
-                    self.min.le = y
-                    y = x
-            z.r.le = z.le
-            z.le.r = z.r
+            while z.c != 0:
+            """
+                remove z's children to root list
+            """
+                x = z.c
+                self.RemoveNode(x)
+                if x == x.r:
+                    z.c = 0
+                else:
+                    z.c = x.r
+                self.AddNode(x, z)  # add x to root list
+                x.p = 0
+            self.RemoveNode(z)
             z.c = 0
             if z == z.r:
                 self.min = 0
@@ -103,17 +94,22 @@ class Fib:
         return z
 
     def Consolidate(self):
+        """
+            merge same degree node in the root list
+            D(n) <= [log(n)/log((√5+1)/2)]. Taking 10 as base
+        """
         A = [0] * 30
-        z = self.min
-        y = z.le
-        while True:
-            x = z
-            d = z.deg
-            while True:
-                if A[d] == 0:
-                    break
+        # consolidate same degree node
+        while self.min != 0:
+            """
+                Traverse root list
+                it works by removing every node in root list
+            """
+            x = self.RemoveMinNode()
+            d = x.deg
+            while A[d] != 0:
                 p = A[d]
-                if x.key > p.key:
+                if x.key > p.key:   # maintain Min-Heap structure
                     temp = x
                     x = p
                     p = temp
@@ -121,11 +117,9 @@ class Fib:
                 A[d] = 0
                 d = d + 1
             A[d] = x
-            if z == y:
-                break
-            z = x.r
-
         self.min = 0
+
+        # add removed node to root list
         for i in range(0, 28):
             if A[i] != 0:
                 if self.min == 0:
@@ -133,29 +127,46 @@ class Fib:
                     A[i].le = A[i]
                     A[i].r = A[i]
                 else:
-                    A[i].r = self.min
-                    A[i].le = self.min.le
-                    A[i].le.r = A[i]
-                    self.min.le = A[i]
+                    self.AddNode(A[i], self.min)
                     if A[i].key < self.min.key:
                         self.min = A[i]
 
     def Link(self, y, x):
-        y.r.le = y.le
-        y.le.r = y.r
+        """
+            make y become x's children
+        """
+        self.RemoveNode(y)
+        if x.c == 0:
+            x.c = y
+        else:
+            self.AddNode(y, x.c)
         y.p = x
         x.deg = x.deg + 1
         y.marked = False
-        if x.c == 0:
-            x.c = y
-            y.le = y
-            y.r = y
+
+    def AddNode(self, y, x):
+        """
+            add y on the x's left
+            a<-->x ==> a<-->y<-->x
+        """
+        y.le = x.le
+        y.r = x
+        x.le.r = y
+        x.le = y
+
+    def RemoveNode(self, x):
+        x.r.le = x.le
+        x.le.r = x.r
+
+    def RemoveMinNode(self):
+        minn = self.min
+        if minn == minn.r:
+            self.min = 0
         else:
-            z = x.c
-            y.r = z
-            y.le = z.le
-            y.le.r = y
-            z.le = y
+            self.RemoveNode(minn)
+            self.min = minn.r
+        minn.le = minn.r = minn
+        return minn
 
 
 """

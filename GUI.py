@@ -275,19 +275,23 @@ def show_query(top_op, top_io, top_mdzz, top_query, path):
             lx_e.lab["bg"] = "red"
         dis, ret = dijkstra(graph, n, m, src)
         lx_3.lab["text"] = "最短路权值:"
-        lx_4.lab["text"] = str(dis[ter])
-        ss = "%d" % ter
 
-        def rout(x, trip):
-            if x == ret[x]:
-                trip = ("%d" % x) + "->" + trip
-                return trip
-            else:
-                trip = ("%d" % x) + "->" + trip
-                return rout(ret[x], trip)
-        ss = rout(ret[ter], ss)
-        lx_5.lab["text"] = "路径:"
-        lx_6.lab["text"] = ss
+        if (ret[ter] != 0):
+            lx_4.lab["text"] = str(dis[ter])
+            ss = "%d" % ter
+
+            def rout(x, trip):
+                if x == ret[x]:
+                    trip = ("%d" % x) + "->" + trip
+                    return trip
+                else:
+                    trip = ("%d" % x) + "->" + trip
+                    return rout(ret[x], trip)
+            ss = rout(ret[ter], ss)
+            lx_5.lab["text"] = "路径:"
+            lx_6.lab["text"] = ss
+        else:
+            lx_4.lab["text"] = "∞"
 
     def sure_2():
         cnt, color = gcp(graph, n, m)
