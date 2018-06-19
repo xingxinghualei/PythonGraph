@@ -5,6 +5,7 @@ import re
 from tkinter import *
 
 from Dijkstra import dijkstra
+from GCP import gcp
 
 
 class Label_1:
@@ -12,7 +13,7 @@ class Label_1:
         self.top = top
         self.lab = Label(top)
 
-    def generate(self, text, row, column, justify=LEFT, padx=10):
+    def generate(self, text, row, column, justify=CENTER, padx=10):
         self.lab = Label(self.top,
                          text=text,
                          justify=justify,
@@ -79,6 +80,7 @@ def show_op(top_op, top_io, top_mdzz, top_query):
     top_op.deiconify()
     lx_op = Label_1(top_op)
     lx_op.generate("图的输入方式:\n1° 手动输入\n2° 文件输入\n0° 退出", 0, 1)
+    lx_op.lab["justify"] = LEFT
     lx_op.lab.grid(rowspan=3)
     lx_op_error = Label_1(top_op)
     lx_op_error.generate("", 3, 2)
@@ -117,6 +119,7 @@ def show_io(top_op, top_io, top_mdzz, top_query):
     top_io.deiconify()
     lx_io = Label_1(top_io)
     lx_io.generate("文件(绝对)路径: \nWindows系统下,以\\分隔\nUnix下以/分隔", 0, 1)
+    lx_io.lab["justify"] = LEFT
     varIO = StringVar()
     ex_io = Entry_1(top_io)
     ex_io.generate(varIO, 1, 1)
@@ -165,6 +168,7 @@ def show_mdzz(top_op, top_io, top_mdzz, top_query):
     ex_e.generate(varE, 1, 2)
     lx_sb = Label_1(top_mdzz)
     lx_sb.generate("输入边 v u w\nu邻接于v，权重为w\n用\'.\'作为间隔", 2, 1)
+    lx_sb.lab["justify"] = LEFT
     varEdges = StringVar()
     ex_sb = Entry_1(top_mdzz)
     ex_sb.generate(varEdges, 5, 1)
@@ -190,8 +194,8 @@ def show_mdzz(top_op, top_io, top_mdzz, top_query):
             judge = False
         for i in range(len(edges)):
             temp = edges[i].split()
-            if(len(temp) != 3):
-                lx_mdzz_error.lab["text"] = "第%d条边缺少参数" % (i + 1)
+            if(len(temp) < 2 or len(temp) > 3):
+                lx_mdzz_error.lab["text"] = "第%d条边参数数目错误" % (i + 1)
                 lx_mdzz_error.lab["bg"] = "red"
                 judge = False
                 break
@@ -246,6 +250,9 @@ def show_query(top_op, top_io, top_mdzz, top_query, path):
     lx_6 = Label_1(top_query)
     lx_6.generate("", 3, 2)
 
+    lx_e = Label_1(top_query)
+    lx_e.generate("", 4, 2)
+
     # 生成Dijkstra的params
     fo = open(path, "r")
     try:
@@ -260,9 +267,14 @@ def show_query(top_op, top_io, top_mdzz, top_query, path):
     fo.close()
 
     def sure_1():
-        src = int(ex_1.entry.get())
-        ter = int(ex_2.entry.get())
+        try:
+            src = int(ex_1.entry.get())
+            ter = int(ex_2.entry.get())
+        except:
+            lx_e.lab["text"] = "输入错误"
+            lx_e.lab["bg"] = "red"
         dis, ret = dijkstra(graph, n, m, src)
+        lx_3.lab["text"] = "最短路权值:"
         lx_4.lab["text"] = str(dis[ter])
         ss = "%d" % ter
 
@@ -274,16 +286,26 @@ def show_query(top_op, top_io, top_mdzz, top_query, path):
                 trip = ("%d" % x) + "->" + trip
                 return rout(ret[x], trip)
         ss = rout(ret[ter], ss)
+        lx_5.lab["text"] = "路径:"
         lx_6.lab["text"] = ss
+
+    def sure_2():
+        cnt, color = gcp(graph, n, m)
+        lx_3.lab["text"] = "需要颜色数:"
+        lx_4.lab["text"] = "%d" % cnt
+        lx_5.lab["text"] = "对应关系"
+        lx_6.lab["text"] = "%s" % str(color[1:n + 1])
 
     def back_1():
         hide(top_query)
         show_op(top_op, top_io, top_mdzz, top_query)
 
     bx_1 = Button_1(top_query)
-    bx_1.generate("确认", sure_1, 4, 1)
+    bx_1.generate("   最短路   ", sure_1, 4, 1)
+    bx_3 = Button_1(top_query)
+    bx_3.generate("着色优化问题", sure_2, 5, 1)
     bx_2 = Button_1(top_query)
-    bx_2.generate("返回", back_1, 4, 3)
+    bx_2.generate("返回", back_1, 5, 3)
 
 
 def hide(top):
