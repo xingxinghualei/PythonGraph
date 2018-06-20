@@ -72,9 +72,9 @@ class Fib:
         z = self.min
         if z != 0:
             while z.c != 0:
-            """
+                """
                 remove z's children to root list
-            """
+                """
                 x = z.c
                 self.RemoveNode(x)
                 if x == x.r:

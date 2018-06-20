@@ -6,6 +6,7 @@ from tkinter import *
 
 from Dijkstra import dijkstra
 from GCP import gcp
+from GCP import gcp2
 
 
 class Label_1:
@@ -294,7 +295,7 @@ def show_query(top_op, top_io, top_mdzz, top_query, path):
             lx_4.lab["text"] = "∞"
 
     def sure_2():
-        cnt, color = gcp(graph, n, m)
+        cnt, color = gcp2(graph, n, m)
         lx_3.lab["text"] = "需要颜色数:"
         lx_4.lab["text"] = "%d" % cnt
         lx_5.lab["text"] = "对应关系"
